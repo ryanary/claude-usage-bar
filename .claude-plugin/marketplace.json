@@ -1,0 +1,12 @@
+{
+  "name": "claude-usage-bar",
+  "description": "A Claude Code mod that shows your usage limits and context above the prompt bar",
+  "owner": { "name": "Ryan Ary" },
+  "plugins": [
+    {
+      "name": "usage-bar",
+      "source": "./",
+      "description": "Usage band above the prompt: 5-hour, weekly and context limits, a Compact button, and idle time and cache when expanded"
+    }
+  ]
+}
