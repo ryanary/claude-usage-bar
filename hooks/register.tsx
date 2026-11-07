@@ -158,6 +158,20 @@ export const register: Register = on => {
     return next(e)
   })
 
+  // no reply reports the smaller context until the next one, so set it from the compaction itself
+  on('session.compact', async ($, e, next) => {
+    const result = await next(e)
+    if (result.skip !== undefined || e.trigger === 'precompute' || e.agentId) return result
+    const after = result.tokensAfter
+      ?? (await $.session.usage({ breakdown: 'summary' })).context.breakdown?.totalTokens
+    await update($, stats, s => s && {
+      ...s,
+      contextTokens: after,
+      contextPercent: after === undefined ? undefined : (after / s.window) * 100,
+    })
+    return result
+  })
+
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     if (e.props.hasSurvey) return next(e)
 
@@ -216,6 +230,17 @@ export const register: Register = on => {
       </Box>
     )
 
+    // runs the /compact command: $.session.compact() isn't available in the desktop app (an SDK session), where
+    // compaction runs inside a turn. Say what happened instead of staying silent
+    const compact = async () => {
+      $.ui.toast('Compacting the conversation…')
+      try {
+        await $.command.run({ command: 'compact' })
+      } catch (err) {
+        $.ui.toast(`Compact failed: ${err instanceof Error ? err.message : String(err)}`, { timeoutMs: 10000 })
+      }
+    }
+
     const top = (
       <Box flexGrow={1} justifyContent="space-between" alignItems="center">
         <Box gap={2} alignItems="center" flexWrap="wrap">
@@ -226,7 +251,7 @@ export const register: Register = on => {
         <Box gap={1} alignItems="center">
           {/* compacting is refused while a turn runs, so the button is hidden until the reply ends */}
           {e.props.isWorking ? null : (
-            <Button key="compact" label="Compact" onPress={() => void $.session.compact().catch(() => {})} />
+            <Button key="compact" label="Compact" onPress={() => void compact()} />
           )}
           <Button key="toggle" label={open ? 'Hide' : 'Show'} onPress={() => update($, isExpanded, v => !v)} />
         </Box>

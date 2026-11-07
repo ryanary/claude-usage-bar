@@ -22,8 +22,10 @@ test('badge shows limits and cache; expanded adds idle, cache and cost', async (
     isExpanded: false,
   }
   on('state.get', (_, e) => ({ value: { value: values[e.key], version: 1 } }))
-  let compacts = 0
-  on('session.compact', () => { compacts++; return { skip: 'test' } })
+  const commands: string[] = []
+  on('command.run', (_, e) => { commands.push(e.command); return { text: '' } })
+  const toasts: string[] = []
+  on('ui.toast', (_, e) => { toasts.push(e.text); return { value: undefined } })
 
   let ui = await $.ui.mount(BAND)
   expect((await ui.find({ type: 'Text', text: /89% left/ }))?.text).toBe('89% left')
@@ -35,7 +37,8 @@ test('badge shows limits and cache; expanded adds idle, cache and cost', async (
   expect((await ui.find({ type: 'Text', text: /412k/ }))?.text).toBe('412k/1M')
   expect(await ui.find({ type: 'Text', text: /used/ })).toBeUndefined()
   await ui.press({ key: 'compact' })
-  expect(compacts).toBe(1)
+  expect(commands).toEqual(['compact'])
+  expect(toasts).toEqual(['Compacting the conversation…'])
   await ui.unmount()
 
   values.isExpanded = true
@@ -60,5 +63,24 @@ test('a limit whose reset time has passed shows 100% left', async ($, on) => {
   const ui = await $.ui.mount(BAND)
   expect((await ui.find({ type: 'Text', text: /% left/ }))?.text).toBe('100% left')
   expect(await ui.find({ type: 'Text', text: /^·/ })).toBeUndefined()
+  await ui.unmount()
+})
+
+test('compacting updates the context on the band', async ($, on) => {
+  const values: Record<string, unknown> = {
+    stats: { window: 1_000_000, contextTokens: 412_000, contextPercent: 41.2 },
+    idleSince: NOW,
+    now: NOW,
+    isExpanded: false,
+  }
+  let version = 1
+  on('state.get', (_, e) => ({ value: { value: values[e.key], version } }))
+  on('state.set', (_, e) => { values[e.key] = e.value; return { value: { isSet: true as const, version: ++version } } })
+  const summary = { role: 'user' as const, text: 'summary', toolUses: [] }
+  on('session.compact', () => ({ messages: [summary], tokensAfter: 30_000 }))
+
+  await $.session.compact({ trigger: 'manual', messages: [summary] })
+  const ui = await $.ui.mount(BAND)
+  expect((await ui.find({ type: 'Text', text: /\/1M/ }))?.text).toBe('30k/1M')
   await ui.unmount()
 })
