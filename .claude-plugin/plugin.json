@@ -1,6 +1,6 @@
 {
   "name": "usage-bar",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Usage band above the prompt: 5-hour, weekly and context limits with a Compact button, expandable to idle time and cache",
   "author": { "name": "Ryan Ary" },
   "types": "./types/index.d.ts"
