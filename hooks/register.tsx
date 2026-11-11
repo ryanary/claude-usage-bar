@@ -251,9 +251,9 @@ export const register: Register = on => {
         <Box gap={1} alignItems="center">
           {/* compacting is refused while a turn runs, so the button is hidden until the reply ends */}
           {e.props.isWorking ? null : (
-            <Button key="compact" label="Compact" onPress={() => void compact()} />
+            <Button key="compact" plain label="⇲" onPress={() => void compact()} />
           )}
-          <Button key="toggle" label={open ? 'Hide' : 'Show'} onPress={() => update($, isExpanded, v => !v)} />
+          <Button key="toggle" plain label={open ? '▴' : '▾'} onPress={() => update($, isExpanded, v => !v)} />
         </Box>
       </Box>
     )
