@@ -103,6 +103,20 @@ const slotSvg = (text: string, prev: string) => {
   )
 }
 
+// An icon's name, fading in with a short slide when its hover area reveals it; fade only under reduced motion
+// ponytail: width estimated from the letter count; tune 0.6 if the name looks cut off or spaced out
+const tipSvg = (text: string) => {
+  const size = 13
+  const w = Math.ceil(text.length * size * 0.6) + 6
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="18" viewBox="0 0 ${w} 18">` +
+    `<style>text{font:500 ${size}px system-ui,'Segoe UI',sans-serif;fill:#888;text-anchor:end;` +
+    `animation:in 150ms ${EASE_OUT} both}@keyframes in{from{opacity:0;transform:translateX(4px)}}` +
+    `@keyframes fade{from{opacity:0}}@media (prefers-reduced-motion:reduce){text{animation-name:fade}}</style>` +
+    `<text x="${w}" y="${size}">${text}</text></svg>`
+  )
+}
+
 const tokens = (n?: number) =>
   n === undefined ? '–'
   : n >= 1e6 ? `${Number((n / 1e6).toFixed(1))}M`
@@ -179,6 +193,12 @@ export const register: Register = on => {
     const { Box, Button, Text } = ui
     // ponytail: the terminal lists an Svg element but draws nothing, so it keeps the text meters and gets no divider
     const Svg = e.surface !== 'terminal' && 'Svg' in ui ? ui.Svg : undefined
+    // hidden until the pointer is over the enclosing keyed Box; the terminal has no hover, so plain text there
+    const tip = (text: string) => (
+      <Box display="none" hover={{ display: 'flex' }}>
+        {Svg ? <Svg source={tipSvg(text)} alt={text} /> : <Text color="subtle">{text}</Text>}
+      </Box>
+    )
     const s = await read($, stats)
     const open = await read($, isExpanded)
     const since = await read($, idleSince)
@@ -251,9 +271,15 @@ export const register: Register = on => {
         <Box gap={1} alignItems="center">
           {/* compacting is refused while a turn runs, so the button is hidden until the reply ends */}
           {e.props.isWorking ? null : (
-            <Button key="compact" plain label="⇲" onPress={() => void compact()} />
+            <Box key="compact-hover" gap={1} alignItems="center">
+              {tip('Compact')}
+              <Button key="compact" plain label="⇲" onPress={() => void compact()} />
+            </Box>
           )}
-          <Button key="toggle" plain label={open ? '▴' : '▾'} onPress={() => update($, isExpanded, v => !v)} />
+          <Box key="toggle-hover" gap={1} alignItems="center">
+            {tip(open ? 'Hide' : 'Show')}
+            <Button key="toggle" plain label={open ? '▾' : '▴'} onPress={() => update($, isExpanded, v => !v)} />
+          </Box>
         </Box>
       </Box>
     )

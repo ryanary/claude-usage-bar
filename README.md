@@ -28,7 +28,7 @@ claude plugin install work-clock@claude-clock-bar
 | **5H** | Your 5-hour limit: % left and the time until it resets |
 | **CTX** | Context: tokens used out of the model's context window. The dots turn yellow at 60% and red at 80% |
 | **⇲** (Compact) | Compacts the conversation, the same as typing `/compact`. Hidden while Claude is replying |
-| **▾ / ▴** (Show / Hide) | Opens or closes the expanded panel |
+| **▴ / ▾** (Show / Hide) | Opens or closes the expanded panel |
 
 **In the expanded panel**
 
