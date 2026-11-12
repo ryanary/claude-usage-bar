@@ -32,9 +32,11 @@ claude plugin install work-clock@claude-clock-bar
 
 **In the expanded panel**
 
+![The expanded panel: the crab and idle time on the left, tokens in the prompt cache on the right](images/usage-bar-expanded.png)
+
 | Item | What it means |
 |---|---|
-| **IDLE** | Time since Claude's last reply. The bar fills toward 1 hour, when the prompt cache expires |
+| **IDLE** | Time since Claude's last reply. The bar fills toward 1 hour, when the prompt cache expires. The crab from [claude-clock-bar](https://github.com/ryanary/claude-clock-bar) types while Claude works, waits while the cache is warm, and dozes once it expires |
 | **IN CACHE** | Tokens currently held in the prompt cache, and their share of the context window |
 
 ## Details
