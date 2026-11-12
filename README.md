@@ -2,10 +2,6 @@
 
 A Claude Code mod that puts a small usage band right above the prompt bar, so you can see how much room you have left without typing `/usage` or `/context`.
 
-```
-7D ●●●●○ 88% left · 6d 17h   5H ●●●●○ 74% left · 4h 7m   CTX ●○○○○ 235k/1M   ⇲ ▾
-```
-
 ![The usage band: weekly, 5-hour and context limits, with the Compact and Show buttons](images/usage-bar.png)
 
 ## Best with claude-clock-bar
