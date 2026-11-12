@@ -182,6 +182,7 @@ export const register: Register = on => {
       ...s,
       contextTokens: after,
       contextPercent: after === undefined ? undefined : (after / s.window) * 100,
+      cached: after === undefined ? s.cached : Math.min(s.cached ?? after, after),
     })
     return result
   })

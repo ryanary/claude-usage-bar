@@ -83,4 +83,9 @@ test('compacting updates the context on the band', async ($, on) => {
   const ui = await $.ui.mount(BAND)
   expect((await ui.find({ type: 'Text', text: /\/1M/ }))?.text).toBe('30k/1M')
   await ui.unmount()
+
+  values.isExpanded = true
+  const term = await $.ui.mount({ ...BAND, surface: 'terminal' })
+  expect((await term.find({ type: 'Text', text: /^30k$/ }))?.text).toBe('30k')
+  await term.unmount()
 })
