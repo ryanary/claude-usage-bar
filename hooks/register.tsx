@@ -117,6 +117,29 @@ const tipSvg = (text: string) => {
   )
 }
 
+// The clock mod's pixel crab (work-clock's scene.ts), here following Claude: typing while it works,
+// awake while the cache is warm, eyes half shut once it expires. Copied, since a plugin can't import another's code
+type CrabState = 'working' | 'awake' | 'asleep'
+const crabSvg = (state: CrabState) => {
+  const R = (x: number, y: number, w: number, h: number, c: string) =>
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`
+  const typing = state === 'working'
+  const eyes = state === 'asleep'
+    ? R(9, 7, 6, 3, '#1F1E1D') + R(17, 7, 6, 3, '#1F1E1D')
+    : R(9, 6, 6, 5, '#1F1E1D') + R(17, 6, 6, 5, '#1F1E1D') + R(10, 7, 4, 3, '#E6F1FB') + R(18, 7, 4, 3, '#E6F1FB') +
+      R(11, 8, 2, 2, '#1F1E1D') + R(19, 8, 2, 2, '#1F1E1D')
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="36" viewBox="0 0 32 24" shape-rendering="crispEdges">` +
+    `<style>.a{animation:ty .3s steps(1) infinite}.b{animation:ty .3s steps(1) infinite .15s}` +
+    `@keyframes ty{50%{transform:translateY(-2px)}}@media (prefers-reduced-motion:reduce){.a,.b{animation:none}}</style>` +
+    `<g${typing ? ' class="b"' : ''}>${R(4, 12, 4, 6, '#534AB7')}</g><g${typing ? ' class="a"' : ''}>${R(24, 12, 4, 6, '#534AB7')}</g>` +
+    `${R(8, 3, 16, 15, '#D97757')}${R(8, 3, 16, 1, '#E8957A')}${eyes}` +
+    `${R(7, 1, 18, 2, '#3d3d3a')}${R(5, 5, 3, 6, '#3d3d3a')}${R(24, 5, 3, 6, '#3d3d3a')}` +
+    (typing ? R(6, 14, 20, 9, '#C9C7BF') + R(15, 17, 2, 3, '#D97757') + R(14, 18, 4, 1, '#D97757') : R(6, 21, 20, 2, '#C9C7BF')) +
+    `</svg>`
+  )
+}
+
 const tokens = (n?: number) =>
   n === undefined ? '–'
   : n >= 1e6 ? `${Number((n / 1e6).toFixed(1))}M`
@@ -302,6 +325,7 @@ export const register: Register = on => {
     const slot = (id: string, text: string) =>
       Svg ? <Svg key={id} source={slotSvg(text, startOf(id, text))} alt={text} /> : big(text)
     const cachedPct = s?.window ? Math.round((cached / s.window) * 100) : 0
+    const crab: CrabState = e.props.isWorking ? 'working' : since !== null && idleMs >= CACHE_TTL ? 'asleep' : 'awake'
 
     return (
       <Box flexDirection="column" gap="sm" paddingX="md" paddingY="xs">
@@ -309,7 +333,17 @@ export const register: Register = on => {
         <Box gap="md" alignItems="center">
           <Box flexDirection="column" flexGrow={1} gap="xs">
             {heading('IDLE')}
-            {big(e.props.isWorking ? 'Working' : since === null ? '–' : duration(idleMs))}
+            <Box gap={1} alignItems="center">
+              {Svg ? (
+                <Svg
+                  source={crabSvg(crab)}
+                  alt={{ working: 'Crab typing at its laptop', awake: 'Crab waiting by its laptop', asleep: 'Crab dozing, cache expired' }[crab]}
+                  width={48}
+                  height={36}
+                />
+              ) : null}
+              {big(e.props.isWorking ? 'Working' : since === null ? '–' : duration(idleMs))}
+            </Box>
             {meter('idle', Math.round((idleMs / CACHE_TTL) * 20), 20, 'error', '━')}
             {caption('since last reply')}
           </Box>
