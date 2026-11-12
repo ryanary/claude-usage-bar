@@ -6,13 +6,13 @@ A Claude Code mod that puts a small usage band right above the prompt bar, so yo
 7D ●●●●○ 88% left · 6d 17h   5H ●●●●○ 74% left · 4h 7m   CTX ●○○○○ 235k/1M   ⇲ ▾
 ```
 
-![The usage band under claude-clock-bar: weekly, 5-hour and context limits, with the Compact and Show buttons](images/clock-and-usage-bar.png)
+![The usage band: weekly, 5-hour and context limits, with the Compact and Show buttons](images/usage-bar.png)
 
 ## Best with claude-clock-bar
 
 This mod works best combined with **[claude-clock-bar](https://github.com/ryanary/claude-clock-bar)**, which shows the time and your work hours. Install both and they share the space above the prompt: the clock row on top and the usage row right under it, so they read as one band.
 
-![claude-clock-bar on its own: the time, a bar filling through the work day, time worked and time left](images/clock-bar.png)
+![claude-clock-bar with the usage band under it: the clock row on top, the usage row below](images/clock-and-usage-bar.png)
 
 ```bash
 claude plugin marketplace add ryanary/claude-clock-bar
