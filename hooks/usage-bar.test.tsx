@@ -4,7 +4,7 @@ const BAND = {
   plugin: 'usage-bar',
   component: 'AbovePrompt',
   surface: 'desktop',
-  props: { hasSurvey: false, isWorking: false, maxRows: 10, bodyColumns: 80, scroll: { offset: 0, bodyRows: 10 }, view: {} },
+  props: { hasSurvey: false, isCollapsed: false, isWorking: false, maxRows: 10, bodyColumns: 80, scroll: { offset: 0, bodyRows: 10 }, view: {} },
 } as const
 
 const NOW = 1_800_000_000_000

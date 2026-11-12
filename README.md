@@ -3,7 +3,23 @@
 A Claude Code mod that puts a small usage band right above the prompt bar, so you can see how much room you have left without typing `/usage` or `/context`.
 
 ```
-7D ●●●●○ 88% left · 6d 17h   5H ●●●●○ 74% left · 4h 7m   CTX ●○○○○ 235k/1M   [Compact] [Show]
+7D ●●●●○ 88% left · 6d 17h   5H ●●●●○ 74% left · 4h 7m   CTX ●○○○○ 235k/1M   ⇲ ▾
+```
+
+![The usage band under claude-clock-bar: weekly, 5-hour and context limits, with the Compact and Show buttons](images/clock-and-usage-bar.png)
+
+## Best with claude-clock-bar
+
+This mod works best combined with **[claude-clock-bar](https://github.com/ryanary/claude-clock-bar)**, which shows the time and your work hours. Install both and they share the space above the prompt: the clock row on top and the usage row right under it, so they read as one band.
+
+![claude-clock-bar on its own: the time, a bar filling through the work day, time worked and time left](images/clock-bar.png)
+
+```bash
+claude plugin marketplace add ryanary/claude-clock-bar
+```
+
+```bash
+claude plugin install work-clock@claude-clock-bar
 ```
 
 ## What it shows
@@ -15,8 +31,8 @@ A Claude Code mod that puts a small usage band right above the prompt bar, so yo
 | **7D** | Your weekly limit: % left and the time until it resets |
 | **5H** | Your 5-hour limit: % left and the time until it resets |
 | **CTX** | Context: tokens used out of the model's context window. The dots turn yellow at 60% and red at 80% |
-| **Compact** | Compacts the conversation, the same as typing `/compact`. Hidden while Claude is replying |
-| **Show / Hide** | Opens or closes the expanded panel |
+| **⇲** (Compact) | Compacts the conversation, the same as typing `/compact`. Hidden while Claude is replying |
+| **▾ / ▴** (Show / Hide) | Opens or closes the expanded panel |
 
 **In the expanded panel**
 
@@ -28,11 +44,11 @@ A Claude Code mod that puts a small usage band right above the prompt bar, so yo
 ## Details
 
 - **No extra cost.** It reads the numbers Claude Code already receives with each reply. It makes no API calls of its own.
-- **When it updates.** The numbers refresh after each reply. Countdowns tick every 15 seconds, and when a reset time passes the limit shows 100% left straight away.
+- **When it updates.** The numbers refresh after each reply, and CTX also refreshes right after a compaction. Countdowns tick every 15 seconds, and when a reset time passes the limit shows 100% left straight away.
 - **Before the first reply** the limits show `–`, because they arrive with the first response.
 - **Motion.** The dots pulse in a wave while Claude works, the meters fill, and the cache number rolls like a slot machine. With your system's reduce-motion setting on, it only fades.
 - **Desktop and terminal.** The desktop app draws the meters as graphics. The terminal draws them as text.
-- **Compact has no confirmation.** One click compacts right away, and a compaction can't be undone.
+- **⇲ (Compact) has no confirmation.** One click compacts right away, and a compaction can't be undone.
 - **Cache life is assumed to be 1 hour.**
 
 ## Install
