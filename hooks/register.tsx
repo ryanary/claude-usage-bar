@@ -1,5 +1,5 @@
 import { atom, read, update } from 'claude-code'
-import type { Register } from 'claude-code'
+import type { Register, RenderChildren } from 'claude-code'
 
 import type { Stats } from '../types'
 
@@ -212,6 +212,9 @@ export const register: Register = on => {
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     if (e.props.hasSurvey) return next(e)
+    // bands beneath this one (another mod's, like the clock) draw above the usage row
+    const below = await next(e)
+    const withBelow = (tree: RenderChildren) => <Box flexDirection="column">{below}{tree}</Box>
 
     const ui = $.ui.resolve(e)
     const { Box, Button, Text } = ui
@@ -312,7 +315,7 @@ export const register: Register = on => {
       memory.delete('idle')
       memory.delete('cache')
       memory.delete('cache-number')
-      return (
+      return withBelow(
         <Box paddingX="md" paddingY="xs">
           {top}
         </Box>
@@ -327,7 +330,7 @@ export const register: Register = on => {
     const cachedPct = s?.window ? Math.round((cached / s.window) * 100) : 0
     const crab: CrabState = e.props.isWorking ? 'working' : since !== null && idleMs >= CACHE_TTL ? 'asleep' : 'awake'
 
-    return (
+    return withBelow(
       <Box flexDirection="column" gap="sm" paddingX="md" paddingY="xs">
         {top}
         <Box gap="md" alignItems="center">

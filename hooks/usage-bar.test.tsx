@@ -7,10 +7,14 @@ const BAND = {
   props: { hasSurvey: false, isCollapsed: false, isWorking: false, maxRows: 10, bodyColumns: 80, scroll: { offset: 0, bodyRows: 10 }, view: {} },
 } as const
 
+// stands in for whatever draws beneath the band: the engine, or another mod's band
+const beneath = (on: any) => on('ui.render', ($: any, e: any) => { const { Box } = $.ui.resolve(e); return <Box /> })
+
 const NOW = 1_800_000_000_000
 const MIN = 60_000
 
 test('badge shows limits and cache; expanded adds idle, cache and cost', async ($, on) => {
+  beneath(on)
   const values: Record<string, unknown> = {
     stats: {
       fiveHour: 11, fiveHourResetsAt: new Date(NOW + 143 * MIN).toISOString(),
@@ -52,6 +56,7 @@ test('badge shows limits and cache; expanded adds idle, cache and cost', async (
 })
 
 test('a limit whose reset time has passed shows 100% left', async ($, on) => {
+  beneath(on)
   const values: Record<string, unknown> = {
     stats: { fiveHour: 80, fiveHourResetsAt: new Date(NOW - MIN).toISOString(), window: 1_000_000 },
     idleSince: NOW,
@@ -67,6 +72,7 @@ test('a limit whose reset time has passed shows 100% left', async ($, on) => {
 })
 
 test('compacting updates the context on the band', async ($, on) => {
+  beneath(on)
   const values: Record<string, unknown> = {
     stats: { window: 1_000_000, contextTokens: 412_000, contextPercent: 41.2 },
     idleSince: NOW,
