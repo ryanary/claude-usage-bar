@@ -1,5 +1,5 @@
 import { atom, read, update } from 'claude-code'
-import type { Register, RenderChildren } from 'claude-code'
+import type { Register } from 'claude-code'
 
 import type { Stats } from '../types'
 
@@ -210,11 +210,15 @@ export const register: Register = on => {
     return result
   })
 
+  // Claude Code stacks one band row per mod; ours goes last, right above the prompt (under the clock's)
+  on('ui.render', { component: 'AbovePromptList' }, ($, e, next) => {
+    const isOurs = (row: { plugin: string }) => row.plugin === 'usage-bar'
+    const { rows } = e.props
+    return next({ ...e, props: { ...e.props, rows: [...rows.filter(row => !isOurs(row)), ...rows.filter(isOurs)] } })
+  })
+
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     if (e.props.hasSurvey) return next(e)
-    // bands beneath this one (another mod's, like the clock) draw above the usage row
-    const below = await next(e)
-    const withBelow = (tree: RenderChildren) => <Box flexDirection="column">{below}{tree}</Box>
 
     const ui = $.ui.resolve(e)
     const { Box, Button, Text } = ui
@@ -315,7 +319,7 @@ export const register: Register = on => {
       memory.delete('idle')
       memory.delete('cache')
       memory.delete('cache-number')
-      return withBelow(
+      return (
         <Box paddingX="md" paddingY="xs">
           {top}
         </Box>
@@ -330,7 +334,7 @@ export const register: Register = on => {
     const cachedPct = s?.window ? Math.round((cached / s.window) * 100) : 0
     const crab: CrabState = e.props.isWorking ? 'working' : since !== null && idleMs >= CACHE_TTL ? 'asleep' : 'awake'
 
-    return withBelow(
+    return (
       <Box flexDirection="column" gap="sm" paddingX="md" paddingY="xs">
         {top}
         <Box gap="md" alignItems="center">
